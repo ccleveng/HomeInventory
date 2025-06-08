@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Inventory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .search-section {
+            margin-bottom: 40px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .location-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .location-part {
+            background: #edf2f7;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .location-separator {
+            color: #a0aec0;
+            font-weight: bold;
+        }
+
+        .add-form {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .add-form:hover {
+            border-color: #cbd5e0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        input, textarea, select {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 8px 20px rgba(229, 62, 62, 0.3);
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .item-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .item-location {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .item-description {
+            color: #718096;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #a0aec0;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #718096;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .status-message {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #f0fff4;
+            color: #38a169;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status-error {
+            background: #fed7d7;
+            color: #e53e3e;
+            border: 1px solid #feb2b2;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 Home Inventory</h1>
+
+        <div id="statusMessage" class="status-message" style="display: none;"></div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalItems">0</div>
+                <div class="stat-label">Total Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalLocations">0</div>
+                <div class="stat-label">Locations</div>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search for items... (e.g., 'christmas presents', 'kitchen cabinet', 'basement green box')">
+            </div>
+        </div>
+
+        <div class="add-form">
+            <h3 style="margin-bottom: 20px; color: #2d3748;">Add New Item</h3>
+            <form id="addItemForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="itemName">Item Name *</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemRoom">Room *</label>
+                        <select id="itemRoom" required>
+                            <option value="">Select room...</option>
+                            <option value="Kitchen">Kitchen</option>
+                            <option value="Living Room">Living Room</option>
+                            <option value="Dining Room">Dining Room</option>
+                            <option value="Master Bedroom">Master Bedroom</option>
+                            <option value="Guest Room">Guest Room</option>
+                            <option value="Bedroom 2">Bedroom 2</option>
+                            <option value="Bedroom 3">Bedroom 3</option>
+                            <option value="Office">Office</option>
+                            <option value="Basement">Basement</option>
+                            <option value="Attic">Attic</option>
+                            <option value="Garage">Garage</option>
+                            <option value="Bathroom">Bathroom</option>
+                            <option value="Master Bath">Master Bath</option>
+                            <option value="Guest Bath">Guest Bath</option>
+                            <option value="Laundry Room">Laundry Room</option>
+                            <option value="Pantry">Pantry</option>
+                            <option value="Closet">Closet</option>
+                            <option value="Storage Room">Storage Room</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="itemOuterLocation">Outer Location</label>
+                        <input type="text" id="itemOuterLocation" placeholder="e.g., Upper Cabinet 1, Green Box, Closet">
+                    </div>
+                    <div class="form-group">
+                        <label for="itemInnerLocation">Inner Location (optional)</label>
+                        <input type="text" id="itemInnerLocation" placeholder="e.g., 3rd Shelf, Behind the shoes">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="itemCategory">Category</label>
+                        <select id="itemCategory">
+                            <option value="">Select category...</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="tools">Tools</option>
+                            <option value="decorations">Decorations</option>
+                            <option value="documents">Documents</option>
+                            <option value="kitchen">Kitchen</option>
+                            <option value="sports">Sports & Recreation</option>
+                            <option value="books">Books</option>
+                            <option value="toys">Toys & Games</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemQuantity">Quantity</label>
+                        <input type="number" id="itemQuantity" min="1" value="1">
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label for="itemDescription">Description / Notes</label>
+                    <textarea id="itemDescription" placeholder="Any additional details that might help you find this item later..."></textarea>
+                </div>
+                <button type="submit" class="btn" id="addButton">Add Item</button>
+            </form>
+        </div>
+
+        <div id="itemsContainer">
+            <div class="items-grid" id="itemsGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        class HomeInventory {
+            constructor() {
+                this.items = [];
+                this.searchTimeout = null;
+                this.init();
+            }
+
+            async init() {
+                this.bindEvents();
+                await this.loadItems();
+            }
+
+            bindEvents() {
+                document.getElementById('addItemForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addItem();
+                });
+
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    clearTimeout(this.searchTimeout);
+                    this.searchTimeout = setTimeout(() => {
+                        this.search(e.target.value);
+                    }, 300);
+                });
+            }
+
+            async loadItems() {
+                try {
+                    const response = await fetch('/api/items');
+                    if (response.ok) {
+                        this.items = await response.json();
+                        this.renderItems();
+                        this.updateStats();
+                    } else {
+                        this.showMessage('Failed to load inventory', 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('Error connecting to server', 'error');
+                    console.error('Load error:', error);
+                }
+            }
+
+            async addItem() {
+                const button = document.getElementById('addButton');
+                const originalText = button.textContent;
+                button.disabled = true;
+                button.textContent = 'Adding...';
+
+                try {
+                    const item = {
+                        name: document.getElementById('itemName').value.trim(),
+                        room: document.getElementById('itemRoom').value,
+                        outerLocation: document.getElementById('itemOuterLocation').value.trim(),
+                        innerLocation: document.getElementById('itemInnerLocation').value.trim(),
+                        category: document.getElementById('itemCategory').value,
+                        quantity: parseInt(document.getElementById('itemQuantity').value) || 1,
+                        description: document.getElementById('itemDescription').value.trim()
+                    };
+
+                    if (!item.name || !item.room) {
+                        this.showMessage('Please fill in the required fields (Name and Room)', 'error');
+                        return;
+                    }
+
+                    const response = await fetch('/api/items', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(item)
+                    });
+
+                    if (response.ok) {
+                        const newItem = await response.json();
+                        this.items.unshift(newItem);
+                        this.renderItems();
+                        this.updateStats();
+                        document.getElementById('addItemForm').reset();
+                        document.getElementById('itemQuantity').value = 1;
+                        this.showMessage('Item added successfully!', 'success');
+                    } else {
+                        const error = await response.json();
+                        this.showMessage(error.error || 'Failed to add item', 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('Error adding item', 'error');
+                    console.error('Add error:', error);
+                } finally {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            }
+
+            async deleteItem(id) {
+                if (!confirm('Are you sure you want to delete this item?')) return;
+
+                try {
+                    const response = await fetch(`/api/items/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        this.items = this.items.filter(item => item.id !== id);
+                        this.renderItems();
+                        this.updateStats();
+                        this.showMessage('Item deleted successfully!', 'success');
+                    } else {
+                        const error = await response.json();
+                        this.showMessage(error.error || 'Failed to delete item', 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('Error deleting item', 'error');
+                    console.error('Delete error:', error);
+                }
+            }
+
+            async search(query) {
+                if (!query.trim()) {
+                    this.renderItems();
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                    if (response.ok) {
+                        const filtered = await response.json();
+                        this.renderItems(filtered);
+                    } else {
+                        this.showMessage('Search failed', 'error');
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    // Fallback to client-side search
+                    const filtered = this.items.filter(item => {
+                        const locationText = [item.room, item.outerLocation, item.innerLocation].filter(Boolean).join(' ');
+                        const searchText = `${item.name} ${locationText} ${item.description} ${item.category}`.toLowerCase();
+                        return searchText.includes(query.toLowerCase());
+                    });
+                    this.renderItems(filtered);
+                }
+            }
+
+            formatLocation(item) {
+                const parts = [item.room];
+                if (item.outerLocation) parts.push(item.outerLocation);
+                if (item.innerLocation) parts.push(item.innerLocation);
+                
+                return parts.map(part => `<span class="location-part">${this.escapeHtml(part)}</span>`).join(' <span class="location-separator">›</span> ');
+            }
+
+            renderItems(itemsToRender = this.items) {
+                const grid = document.getElementById('itemsGrid');
+                
+                if (itemsToRender.length === 0) {
+                    grid.innerHTML = '<div class="no-results">No items found. Try a different search term or add some items!</div>';
+                    return;
+                }
+
+                grid.innerHTML = itemsToRender.map(item => `
+                    <div class="item-card">
+                        <div class="item-name">${this.escapeHtml(item.name)}</div>
+                        <div class="item-location">📍 <div class="location-display">${this.formatLocation(item)}</div></div>
+                        ${item.description ? `<div class="item-description">${this.escapeHtml(item.description)}</div>` : ''}
+                        <div class="item-meta">
+                            <span>
+                                ${item.category ? `${item.category} • ` : ''}
+                                Qty: ${item.quantity}
+                            </span>
+                            <span>
+                                <button class="btn btn-danger" onclick="inventory.deleteItem(${item.id})" style="padding: 4px 8px; font-size: 12px;">Delete</button>
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            updateStats() {
+                const totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
+                const uniqueLocations = new Set(this.items.map(item => 
+                    [item.room, item.outerLocation, item.innerLocation].filter(Boolean).join(' / ')
+                )).size;
+
+                document.getElementById('totalItems').textContent = totalItems;
+                document.getElementById('totalLocations').textContent = uniqueLocations;
+            }
+
+            showMessage(message, type) {
+                const messageEl = document.getElementById('statusMessage');
+                messageEl.textContent = message;
+                messageEl.className = `status-message status-${type}`;
+                messageEl.style.display = 'block';
+                
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 5000);
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Initialize the app
+        const inventory = new HomeInventory();
+    </script>
+</body>
+</html>
